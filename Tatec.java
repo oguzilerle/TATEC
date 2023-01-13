@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Tatec
 {
@@ -44,8 +45,14 @@ public class Tatec
         AddBids(students, courses, tokenFilePath);
         courses.forEach(Course::EnrollStudents);
         students.forEach(student -> student.CalculateUnhappiness(h));
-        WriteTATECAdmission(courses);
-        WriteTATECUnhappiness(students);
+        WriteAdmission(courses, OUT_TATEC_ADMISSION);
+        WriteUnhappiness(students, OUT_TATEC_UNHAPPY);
+
+        List<Course> coursesRandom = ParseCourseFile(courseFilePath);
+        List<Student> studentsRandom = ParseStudentIds(studentIdFilePath);
+        //IMPLEMENT RANDOM ENROLLMENT HERE
+        WriteAdmission(coursesRandom, OUT_RAND_ADMISSION);
+        WriteUnhappiness(studentsRandom, OUT_RAND_UNHAPPY);
     }
 
     private static List<Course> ParseCourseFile(String courseFilePath)
@@ -100,11 +107,11 @@ public class Tatec
                     .forEach(line -> {
                         Student student = students.get(studentIndex.get());
 
-                        for (int i = 0; i < courses.size(); i++)
-                        {
-                            int bid = Integer.parseInt(line[i]);
-                            student.AssignTokens(courses.get(i), bid);
-                        }
+                        IntStream.range(0, courses.size())
+                                .forEach(i -> {
+                                    int bid = Integer.parseInt(line[i]);
+                                    student.AssignTokens(courses.get(i), bid);
+                                });
                         studentIndex.incrementAndGet();
                     });
         }
@@ -114,9 +121,9 @@ public class Tatec
         }
     }
 
-    private static void WriteTATECAdmission(List<Course> courses)
+    private static void WriteAdmission(List<Course> courses, String admissionType)
     {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(OUT_TATEC_ADMISSION))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(admissionType))) {
             courses.stream().map(course -> course.getCourseName() + ", " + course.getEnrolledStudents().stream().map(Student::getStudentId).collect(Collectors.joining(", "))).forEach(line -> {
                 try {
                     writer.write(line);
@@ -129,14 +136,14 @@ public class Tatec
             e.printStackTrace();
         }
     }
-    private static void WriteTATECUnhappiness(List<Student> students)
+    private static void WriteUnhappiness(List<Student> students, String admissionType)
     {
         Double averageUnhappinessScore = students.stream()
                 .mapToDouble(Student::GetUnhappinessScore)
                 .average()
                 .orElse(0);
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(OUT_TATEC_UNHAPPY))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(admissionType))) {
             writer.write(averageUnhappinessScore.toString());
             writer.newLine();
             students.stream().map(student -> student.GetUnhappinessScore()).forEach(line -> {
