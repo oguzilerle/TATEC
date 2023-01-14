@@ -67,20 +67,6 @@ public class Course {
         }
     }
 
-    public void AddBidForRandom(Student student, int bid)
-    {
-        bids.add(new AbstractMap.SimpleEntry<>(student,bid));
-        for (int i = 1; i < bids.size(); i++) {
-            AbstractMap.SimpleEntry current = bids.get(i);
-            int j = i - 1;
-            int currentValue = bids.get(i).getValue().intValue();
-            while (j >= 0 && bids.get(j).getValue().intValue() > currentValue) {
-                bids.set(j + 1, bids.get(j));
-                j--;
-            }
-            bids.set(j + 1, current);
-        }
-    }
 
     public List<AbstractMap.SimpleEntry<Student, Integer>> getBidsList()
     {
