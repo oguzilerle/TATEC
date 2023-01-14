@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.*;
 import java.util.stream.IntStream;
 
 public class Tatec
@@ -65,7 +63,7 @@ public class Tatec
         try
         {
             List<Course> courses = Files.lines(path)
-                    .map(line -> line.split(", "))
+                    .map(line -> line.split(","))
                     .map(line -> new Course(line[0], Integer.parseInt(line[1])))
                     .collect(Collectors.toList());
 
