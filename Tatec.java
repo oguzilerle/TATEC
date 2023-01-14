@@ -84,7 +84,7 @@ public class Tatec
         try
         {
             List<Student> students = Files.lines(path)
-                    .map(line -> new Student(line))
+                    .map(line -> new Student(line, CORRECT_TOTAL_TOKEN_PER_STUDENT))
                     .collect(Collectors.toList());
 
             return students;

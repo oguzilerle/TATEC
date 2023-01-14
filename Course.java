@@ -19,10 +19,6 @@ public class Course {
         return courseName;
     }
 
-    public int getCourseCapacity() {
-        return courseCapacity;
-    }
-
     public List<Student> getEnrolledStudents() {
         return new ArrayList<Student>(enrolledStudents);
     }
@@ -70,11 +66,5 @@ public class Course {
         bids = bids.stream()
                 .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
                 .collect(Collectors.toList());
-    }
-
-
-    public List<AbstractMap.SimpleEntry<Student, Integer>> getBidsList()
-    {
-        return bids;
     }
 }

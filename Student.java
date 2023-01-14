@@ -7,10 +7,9 @@ public class Student {
     private double unhappyScore;
     private List<AbstractMap.SimpleEntry<Course, Boolean>> enrolledToAppliedCourses;
 
-    private int appliedCourseCount;
-    public Student(String studentId) {
+    public Student(String studentId, int tokenCount) {
         this.studentId = studentId;
-        this.tokenCount = 100;
+        this.tokenCount = tokenCount;
         this.courseTokens = new HashMap<Course, Integer>();
         enrolledToAppliedCourses = new ArrayList<>();
     }
@@ -19,17 +18,12 @@ public class Student {
         return studentId;
     }
 
-    public int getTokenCount() {
-        return tokenCount;
-    }
-
     public void AssignTokens(Course course, int tokenCount) {
         if (tokenCount <= this.tokenCount && tokenCount > 0) {
             this.tokenCount -= tokenCount;
             courseTokens.put(course, tokenCount);
             enrolledToAppliedCourses.add(new AbstractMap.SimpleEntry<>(course, false));
             course.AddBid(this, tokenCount);
-            appliedCourseCount++;
         }
         else if (tokenCount > this.tokenCount)
         {
