@@ -42,7 +42,7 @@ public class Tatec
 
         List<Course> courses = ParseCourseFile(courseFilePath);
         List<Student> students = ParseStudentIds(studentIdFilePath);
-        AddBids(students, courses, tokenFilePath);
+        AddBids(students, courses, tokenFilePath, "tatec");
         courses.forEach(Course::EnrollStudents);
         students.forEach(student -> student.CalculateUnhappiness(h));
         WriteAdmission(courses, OUT_TATEC_ADMISSION);
@@ -51,6 +51,9 @@ public class Tatec
         List<Course> coursesRandom = ParseCourseFile(courseFilePath);
         List<Student> studentsRandom = ParseStudentIds(studentIdFilePath);
         //IMPLEMENT RANDOM ENROLLMENT HERE
+        AddBids(studentsRandom, coursesRandom, tokenFilePath, "random");
+        coursesRandom.forEach(Course::EnrollStudentsRandomly);
+        studentsRandom.forEach(student -> student.CalculateUnhappiness(h));
         WriteAdmission(coursesRandom, OUT_RAND_ADMISSION);
         WriteUnhappiness(studentsRandom, OUT_RAND_UNHAPPY);
     }
@@ -95,7 +98,7 @@ public class Tatec
         return null;
     }
 
-    private static void AddBids(List<Student> students, List<Course> courses, String tokenFilePath)
+    private static void AddBids(List<Student> students, List<Course> courses, String tokenFilePath, String type)
     {
         Path path = Paths.get(tokenFilePath);
 
@@ -110,7 +113,7 @@ public class Tatec
                         IntStream.range(0, courses.size())
                                 .forEach(i -> {
                                     int bid = Integer.parseInt(line[i]);
-                                    student.AssignTokens(courses.get(i), bid);
+                                    student.AssignTokens(courses.get(i), bid, type);
                                 });
                         studentIndex.incrementAndGet();
                     });

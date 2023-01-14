@@ -23,12 +23,19 @@ public class Student {
         return tokenCount;
     }
 
-    public void AssignTokens(Course course, int tokenCount) {
+    public void AssignTokens(Course course, int tokenCount, String type) {
         if (tokenCount <= this.tokenCount && tokenCount > 0) {
             this.tokenCount -= tokenCount;
             courseTokens.put(course, tokenCount);
             enrolledToAppliedCourses.add(new AbstractMap.SimpleEntry<>(course, false));
-            course.AddBid(this, tokenCount);
+            if (type.equals("tatec"))
+            {
+                course.AddBid(this, tokenCount);
+            }
+            else
+            {
+                course.AddBidForRandom(this, tokenCount);
+            }
             appliedCourseCount++;
         }
         else if (tokenCount > this.tokenCount)
@@ -52,6 +59,10 @@ public class Student {
 
     public void CalculateUnhappiness(double h)
     {
+        if (tokenCount != 0)
+        {
+            throw new ArithmeticException("Student " + studentId + " has " + tokenCount + " tokens left");
+        }
         final boolean[] assignedToClass = {false};
 
         enrolledToAppliedCourses.stream()
