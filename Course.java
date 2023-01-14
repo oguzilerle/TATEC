@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Course {
     private String courseName;
@@ -26,14 +28,18 @@ public class Course {
     }
 
     public void EnrollStudents() {
-        int lastEnrolledBid = 100;
-        while (enrolledStudents.size() < courseCapacity && bids.size() > 0) {
-            enrolledStudents.add(bids.get(0).getKey());
-            bids.get(0).getKey().EnrollToCourse(this);
-            lastEnrolledBid = bids.get(0).getValue();
-            bids.remove(0);
-        }
-        final int finalEnrolledBid = lastEnrolledBid;
+        SortBids();
+        AtomicInteger lastEnrolledBid = new AtomicInteger(100);
+        List<AbstractMap.SimpleEntry<Student, Integer>> remainingBids = bids.stream()
+                .filter(bid -> enrolledStudents.size() < courseCapacity)
+                .peek(bid -> {
+                    enrolledStudents.add(bid.getKey());
+                    bid.getKey().EnrollToCourse(this);
+                    lastEnrolledBid.set(bid.getValue());;
+                })
+                .collect(Collectors.toList());
+        bids.removeAll(remainingBids);
+        final int finalEnrolledBid = lastEnrolledBid.get();
         bids.stream()
                 .filter(bid -> bid.getValue() == finalEnrolledBid)
                 .forEach(bid -> {
@@ -57,16 +63,13 @@ public class Course {
     public void AddBid(Student student, int bid)
     {
         bids.add(new AbstractMap.SimpleEntry<>(student,bid));
-        for (int i = 1; i < bids.size(); i++) {
-            AbstractMap.SimpleEntry current = bids.get(i);
-            int j = i - 1;
-            int currentValue = bids.get(i).getValue().intValue();
-            while (j >= 0 && bids.get(j).getValue().intValue() < currentValue) {
-                bids.set(j + 1, bids.get(j));
-                j--;
-            }
-            bids.set(j + 1, current);
-        }
+    }
+
+    public void SortBids()
+    {
+        bids = bids.stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+                .collect(Collectors.toList());
     }
 
 
