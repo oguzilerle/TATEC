@@ -7,6 +7,11 @@ public class Student {
     private double unhappyScore;
     private List<AbstractMap.SimpleEntry<Course, Boolean>> enrolledToAppliedCourses;
 
+    private boolean enrolledToAtLeastOneCourse = false;
+    private int enrolledCount;
+
+    private int appliedCount;
+
     public Student(String studentId, int tokenCount) {
         this.studentId = studentId;
         this.tokenCount = tokenCount;
@@ -24,6 +29,7 @@ public class Student {
             courseTokens.put(course, tokenCount);
             enrolledToAppliedCourses.add(new AbstractMap.SimpleEntry<>(course, false));
             course.AddBid(this, tokenCount);
+            appliedCount++;
         }
         else if (tokenCount > this.tokenCount)
         {
@@ -41,7 +47,12 @@ public class Student {
 
     public void EnrollToCourse(Course course)
     {
-        enrolledToAppliedCourses.stream().filter(entry -> entry.getKey().getCourseName().equals(course.getCourseName())).findFirst().get().setValue(true);
+        if (enrolledToAppliedCourses.stream().anyMatch(c -> c.getKey().getCourseName().equals(course.getCourseName())))
+        {
+            enrolledToAppliedCourses.stream().filter(entry -> entry.getKey().getCourseName().equals(course.getCourseName())).findFirst().get().setValue(true);
+        }
+        enrolledCount++;
+        enrolledToAtLeastOneCourse = true;
     }
 
     public void CalculateUnhappiness(double h)
@@ -50,22 +61,23 @@ public class Student {
         {
             throw new ArithmeticException("Student " + studentId + " has " + tokenCount + " tokens left");
         }
-        final boolean[] assignedToClass = {false};
 
         enrolledToAppliedCourses.stream()
                 .forEach(entry -> {
-                    if (entry.getValue() == true) {
-                        assignedToClass[0] = true;
-                    }
                     if (!entry.getValue()) unhappyScore += (-100/h) * Math.log(1 - getAssignedToken(entry.getKey())/100.0);
                 });
 
-        if (!assignedToClass[0]) unhappyScore *= unhappyScore;
+        if (!enrolledToAtLeastOneCourse) unhappyScore *= unhappyScore;
         if (unhappyScore > 100) unhappyScore = 100;
     }
 
     public double GetUnhappinessScore()
     {
         return unhappyScore;
+    }
+
+    public boolean canEnroll()
+    {
+        return enrolledCount < appliedCount;
     }
 }

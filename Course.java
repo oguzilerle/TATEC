@@ -8,11 +8,13 @@ public class Course {
     private HashSet<Student> enrolledStudents;
     private List<AbstractMap.SimpleEntry<Student, Integer>> bids;
 
+    private List<Student> allStudents;
     public Course(String courseName, int courseCapacity) {
         this.courseName = courseName;
         this.courseCapacity = courseCapacity;
         this.enrolledStudents = new HashSet<Student>();
         this.bids = new ArrayList<>();
+        allStudents = new ArrayList<>();
     }
 
     public String getCourseName() {
@@ -46,14 +48,15 @@ public class Course {
 
     public void EnrollStudentsRandomly()
     {
-        Collections.shuffle(bids);
-        bids.stream()
-                .filter(bid -> enrolledStudents.size() < courseCapacity)
-                .limit(courseCapacity - enrolledStudents.size())
-                .forEach(bid -> {
-                    enrolledStudents.add(bid.getKey());
-                    bid.getKey().EnrollToCourse(this);
-                });
+        Collections.shuffle(allStudents);
+
+        allStudents.stream().forEach(student -> {
+            if (enrolledStudents.size() < courseCapacity && student.canEnroll())
+            {
+                enrolledStudents.add(student);
+                student.EnrollToCourse(this);
+            }
+        });
     }
 
     public void AddBid(Student student, int bid)
@@ -66,5 +69,10 @@ public class Course {
         bids = bids.stream()
                 .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    public void FillAllStudents(List<Student> students)
+    {
+        students.stream().forEach(student -> allStudents.add(student));
     }
 }

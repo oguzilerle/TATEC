@@ -38,6 +38,7 @@ public class Tatec
             return;
         }
 
+        /************ TATEC Enrollment **************/
         List<Course> courses = ParseCourseFile(courseFilePath);
         List<Student> students = ParseStudentIds(studentIdFilePath);
         AddBids(students, courses, tokenFilePath);
@@ -46,9 +47,11 @@ public class Tatec
         WriteAdmission(courses, OUT_TATEC_ADMISSION);
         WriteUnhappiness(students, OUT_TATEC_UNHAPPY);
 
+
+        /************ Random Enrollment **************/
         List<Course> coursesRandom = ParseCourseFile(courseFilePath);
         List<Student> studentsRandom = ParseStudentIds(studentIdFilePath);
-        //IMPLEMENT RANDOM ENROLLMENT HERE
+        coursesRandom.forEach(course -> course.FillAllStudents(studentsRandom));
         AddBids(studentsRandom, coursesRandom, tokenFilePath);
         coursesRandom.forEach(Course::EnrollStudentsRandomly);
         studentsRandom.forEach(student -> student.CalculateUnhappiness(h));
