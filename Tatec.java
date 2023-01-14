@@ -65,7 +65,7 @@ public class Tatec
         try
         {
             List<Course> courses = Files.lines(path)
-                    .map(line -> line.split(","))
+                    .map(line -> line.split(", "))
                     .map(line -> new Course(line[0], Integer.parseInt(line[1])))
                     .collect(Collectors.toList());
 

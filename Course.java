@@ -45,11 +45,13 @@ public class Course {
     public void EnrollStudentsRandomly()
     {
         Collections.shuffle(bids);
-        while (enrolledStudents.size() < courseCapacity && bids.size() > 0) {
-            enrolledStudents.add(bids.get(0).getKey());
-            bids.get(0).getKey().EnrollToCourse(this);
-            bids.remove(0);
-        }
+        bids.stream()
+                .filter(bid -> enrolledStudents.size() < courseCapacity)
+                .limit(courseCapacity - enrolledStudents.size())
+                .forEach(bid -> {
+                    enrolledStudents.add(bid.getKey());
+                    bid.getKey().EnrollToCourse(this);
+                });
     }
 
     public void AddBid(Student student, int bid)
